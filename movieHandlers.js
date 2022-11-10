@@ -1,3 +1,5 @@
+const database = require("./database");
+
 const movies = [
   {
     id: 1,
@@ -40,11 +42,9 @@ const getMovies = (req, res) => {
 const getMovieById = (req, res) => {
   const id = parseInt(req.params.id);
 
-  const movie = movies.find((movie) => movie.id === id);
-
   database
     .query("select * from movies where id = ?", [id])
-    .then.then(([movies]) => {
+    .then(([movies]) => {
       if (movies[0] != null) {
         res.json(movies[0]);
       } else {
@@ -62,7 +62,7 @@ const postMovie = (req, res) => {
 
   database
     .query(
-      "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO movies (title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
       [title, director, year, color, duration]
     )
     .then(([result]) => {
@@ -74,8 +74,31 @@ const postMovie = (req, res) => {
     });
 };
 
+const updateMovie = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { title, director, year, color, duration } = req.body;
+
+  database
+    .query(
+      "UPDATE movies SET title = ?, director = ?, year = ?, color = ?, duration = ? WHERE id = ?",
+      [title, director, year, color, duration, id]
+    )
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error editing the movie");
+    });
+};
+
 module.exports = {
   getMovies,
   getMovieById,
   postMovie,
+  updateMovie,
 };
