@@ -1,7 +1,7 @@
-const database = require("./database");
+const database = require("../database");
 
 const getUsers = (req, res) => {
-  let sql = "select * from users ";
+  let sql = "select firstname, lastname, email, city, language from users ";
   const sqlValues = [];
 
   if (req.query.language != null) {
@@ -105,10 +105,22 @@ const deleteUser = (req, res) => {
     });
 };
 
+const isItDwight = (req, res) => {
+  if (
+    req.body.email === "dwight@theoffice.com" &&
+    req.body.password === "123456"
+  ) {
+    res.send("Credentials are valid");
+  } else {
+    res.sendStatus(401);
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
   postUser,
   updateUser,
   deleteUser,
+  isItDwight,
 };
